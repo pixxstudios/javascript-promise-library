@@ -10,11 +10,13 @@ class MyPromise {
     #state = STATE.PENDING
     #value
 
+    #onSuccessBind = this.#onSuccess.bind(this)
+    #onFailBind = this.#onFail.bind(this)
+
     constructor(callback) {
         try {
-        callback(this.#onSuccess, this.#onFail)
+        callback(this.#onSuccessBind, this.#onFailBind)
         } catch(err) {
-            console.log('catch')
             this.#onFail(err)
         }
     }
@@ -38,7 +40,6 @@ class MyPromise {
     }
 
     #onSuccess(value) {
-        console.log('onSuccess ', this.#state)
         if (this.#state != STATE.PENDING) return;
 
         this.#state = STATE.FULFILLED;
@@ -48,7 +49,6 @@ class MyPromise {
     }
 
     #onFail(value) {
-        console.log('onFail ', this.#state)
         if (this.#state != STATE.PENDING) return;
 
         this.#state = STATE.REJECTED
