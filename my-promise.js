@@ -58,10 +58,40 @@ class MyPromise {
     }
 
     then(thenCb, catchCb) {
-        if (thenCb !== undefined) this.#thenCallbacks.push(thenCb)
-        if (catchCb !== undefined) this.#catchCallbacks.push(catchCb)
+        return new MyPromise((resolve, reject) => {
+            this.#thenCallbacks.push(result => {
+                if(thenCb === null) {
+                    resolve(result)
+                    return
+                }
 
-        this.#runCallbacks()
+                try {
+                    resolve(thenCb(result))
+                }catch(error){
+                    reject(error)
+                }
+            })
+
+
+            this.#catchCallbacks.push(result => {
+                if(catchCb === null) {
+                    reject(result)
+                    return
+                }
+
+                try {
+                    resolve(catchCb(result))
+                }catch(error){
+                    reject(error)
+                }
+            })
+
+
+            if (thenCb !== undefined) this.#thenCallbacks.push(thenCb)
+            if (catchCb !== undefined) this.#catchCallbacks.push(catchCb)
+    
+            this.#runCallbacks()
+        })
     }
 
     catch(cb) {
