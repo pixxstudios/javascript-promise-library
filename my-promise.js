@@ -5,18 +5,28 @@ const STATE = {
 }
 
 class MyPromise {
+    //when multiple then statements are chained together
     #thenCallbacks = []
+
+    //when multiple catch statements are chained together
     #catchCallbacks = []
+
+    // initial state for any promise
     #state = STATE.PENDING
+
     #value
 
+    // this.#onSuccess and this.#onFail doesn't work directly
+    // so using bind and assigning to new private variables
     #onSuccessBind = this.#onSuccess.bind(this)
     #onFailBind = this.#onFail.bind(this)
 
     constructor(callback) {
         try {
-        callback(this.#onSuccessBind, this.#onFailBind)
+            // the default callback which is passed when initializing a new Promise
+            callback(this.#onSuccessBind, this.#onFailBind)
         } catch(err) {
+            // in case there is some error
             this.#onFail(err)
         }
     }
