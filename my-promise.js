@@ -40,21 +40,35 @@ class MyPromise {
     }
 
     #onSuccess(value) {
-        if (this.#state != STATE.PENDING) return;
+        queueMicrotask(() => {
+            if (this.#state != STATE.PENDING) return;
 
-        this.#state = STATE.FULFILLED;
-        this.#value = value
+            if (value && (typeof value.then === 'function')) {
+                value.then(this.#onSuccessBind, this.#onFailBind)
+                return
+            }
 
-        this.#runCallbacks()
+            this.#state = STATE.FULFILLED;
+            this.#value = value
+
+            this.#runCallbacks()
+        })
     }
 
     #onFail(value) {
-        if (this.#state != STATE.PENDING) return;
+        queueMicrotask(() => {
+            if (this.#state != STATE.PENDING) return;
+            
+            if (value && (typeof value.then === 'function')) {
+                value.then(this.#onSuccessBind, this.#onFailBind)
+                return
+            }
 
-        this.#state = STATE.REJECTED
-        this.#value = value
+            this.#state = STATE.REJECTED
+            this.#value = value
 
-        this.#runCallbacks()
+            this.#runCallbacks()
+        })
     }
 
     then(thenCb, catchCb) {
